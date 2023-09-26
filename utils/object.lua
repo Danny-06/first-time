@@ -6,7 +6,7 @@ local Object = {}
 ---@class Constructor
 Object.Constructor = {}
 
----comment
+---Allow classes to be callable to instantiate objects
 ---@param self { constructor: fun(...:unknown): table }
 ---@param ... unknown
 ---@return table
@@ -15,10 +15,12 @@ function Object.Constructor:__call(...)
   return self.constructor(instance, ...)
 end
 
+---Print string representation of objects
 function Object.print(object)
   print(Object.stringify(object))
 end
 
+--Transform objects into its string representation
 function Object.stringify(object, initalIdentation)
   if type(object) ~= 'table' then
     return tostring(object)
