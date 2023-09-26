@@ -62,22 +62,6 @@ function Object.stringify(object, initalIdentation)
     end
 
     objectString = objectString..identation.."['"..key.."']: "..tostring(stringifiedValue)..',\n'
-
-    -- local rawValue = rawget(object, key)
-
-    -- local stringifiedRawValue = rawValue
-
-    -- if rawValue ~= value then
-    --   if rawValue == object then
-    --     stringifiedRawValue = '[[Self]]'
-    --   elseif type(rawValue) == 'table' then
-    --     stringifiedRawValue = Object.stringify(rawValue, identation..'  ')
-    --   elseif type(rawValue) == 'string' then
-    --     stringifiedRawValue = "'"..rawValue.."'"
-    --   end
-
-    --   objectString = objectString..identation.."[[Raw: '"..key.."']]: "..tostring(stringifiedRawValue)..',\n'
-    -- end
   end
 
   local metatable = getmetatable(object)
