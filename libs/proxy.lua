@@ -21,6 +21,16 @@ Proxy.__index = {}
 ---#end
 
 ---
+---@param self ProxyInstance
+---@return string
+function Proxy.__tostring(self)
+  local target = Proxy.getTarget(self)
+  local targetStringified = tostring(target)
+
+  return 'Proxy('..targetStringified..')'
+end
+
+---
 ---@class Handler
 ---@field get? fun(target: table, property: any): any
 ---@field set? fun(target: table, property: any, value: any)
@@ -39,6 +49,13 @@ function Proxy.constructor(self, target, handler)
   }
 
   return self
+end
+
+---
+---@param proxy ProxyInstance
+---@return table
+function Proxy.getTarget(proxy)
+  return Proxy.instancesPropertiesMap[proxy].target
 end
 
 ---
