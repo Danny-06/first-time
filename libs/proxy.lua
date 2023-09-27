@@ -55,6 +55,20 @@ function Proxy.getTarget(proxy)
 end
 
 ---
+---@param proxy ProxyInstance
+---@return boolean
+function Proxy.isProxy(proxy)
+  if Proxy.instancesPropertiesMap[proxy] == nil then
+    return false
+  end
+
+  return true
+end
+
+
+------- # Proxy access handlers -------
+
+---
 ---@param target table
 ---@param property any
 ---@return any
