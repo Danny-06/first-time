@@ -16,8 +16,9 @@ Proxy.instancesPropertiesMap = {}
 Proxy.__index = {}
 
 ---
----@class ProxyInstance: {[any]: any}
+---@class ProxyInstance
 ---@overload fun(...: any): any
+---@field [any] any
 ---#end
 
 ---
