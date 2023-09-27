@@ -3,53 +3,51 @@ local Constructor = require('utils.object').Constructor
 ---
 ---@class ProxyClass
 ---@overload fun(target: unknown, handler: Handler): ProxyInstance
----@field private constructor fun(self: ProxyInstance, target: unknown, handler: Handler): ProxyInstance
+---@field private constructor fun(self: ProxyInstance, target: table, handler: Handler): ProxyInstance
+---@field private instancesPropertiesMap {[ProxyInstance]: {target: table, handler: Handler}}
 local Proxy = setmetatable({}, Constructor)
 
 ---
+Proxy.instancesPropertiesMap = {}
+
+---
 ---@class ProxyPrototype
----@overload fun(self: ProxyInstance, key: string): unknown
+---@overload fun(self: ProxyInstance, key: string): any
 Proxy.__index = {}
 
 ---
----@class ProxyInstance: {[string]: unknown}
----@overload fun(...: unknown): unknown
----@field private __index {target: table, handler: Handler}
+---@class ProxyInstance: {[any]: any}
+---@overload fun(...: any): any
 ---#end
 
 ---
 ---@class Handler
----@field get? fun(target: table | function, property: string): unknown
----@field set? fun(target: table | function, property: string, value: unknown)
----@field call? fun(target: table | function, ...: unknown): unknown
+---@field get? fun(target: table | function, property: any): any
+---@field set? fun(target: table | function, property: any, value: any)
+---@field call? fun(target: table | function, ...: any): any
 ---#end
 
 ---
 ---@param self ProxyInstance
----@param target unknown
+---@param target table
 ---@param handler Handler
 ---@return ProxyInstance
 function Proxy.constructor(self, target, handler)
-  ---@diagnostic disable
-
-  -- Store ProxyInstance properties in `__index`
-  -- as a way to hide them.
-  -- `rawset()` is used to avoid triggering `Proxy.__newindex()`
-  rawset(self, '__index', {})
-
-  self.__index.target = target
-  self.__index.handler = handler
+  Proxy.instancesPropertiesMap[self] = {
+    target = target,
+    handler = handler
+  }
 
   return self
 end
 
 ---Handle getters
 ---@param self ProxyInstance
----@param key string
----@return unknown
+---@param key any
+---@return any
 function Proxy.__index(self, key)
-  local target = self.__index.target
-  local handler = self.__index.handler
+  local target = Proxy.instancesPropertiesMap[self].target
+  local handler = Proxy.instancesPropertiesMap[self].handler
 
   if handler.get then
     return handler.get(target, key)
@@ -60,11 +58,11 @@ end
 
 ---Handle setters
 ---@param self ProxyInstance
----@param key string
----@param value unknown
+---@param key any
+---@param value any
 function Proxy.__newindex(self, key, value)
-  local target = self.__index.target
-  local handler = self.__index.handler
+  local target = Proxy.instancesPropertiesMap[self].target
+  local handler = Proxy.instancesPropertiesMap[self].handler
 
   if handler.set then
     handler.set(target, key, value)
@@ -76,10 +74,10 @@ end
 
 ---Handle calling object
 ---@param self ProxyInstance
----@param ... unknown
+---@param ... any
 function Proxy.__call(self, ...)
-  local target = self.__index.target
-  local handler = self.__index.handler
+  local target = Proxy.instancesPropertiesMap[self].target
+  local handler = Proxy.instancesPropertiesMap[self].handler
 
   if handler.get then
     return handler.call(target, ...)
