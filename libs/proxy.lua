@@ -2,7 +2,7 @@ local Constructor = require('utils.object').Constructor
 
 ---
 ---@class ProxyClass
----@overload fun(target: unknown, handler: Handler): ProxyInstance
+---@overload fun(target: table, handler: Handler): ProxyInstance
 ---@field private constructor fun(self: ProxyInstance, target: table, handler: Handler): ProxyInstance
 ---@field private instancesPropertiesMap {[ProxyInstance]: {target: table, handler: Handler}}
 local Proxy = setmetatable({}, Constructor)
@@ -22,9 +22,9 @@ Proxy.__index = {}
 
 ---
 ---@class Handler
----@field get? fun(target: table | function, property: any): any
----@field set? fun(target: table | function, property: any, value: any)
----@field call? fun(target: table | function, ...: any): any
+---@field get? fun(target: table, property: any): any
+---@field set? fun(target: table, property: any, value: any)
+---@field call? fun(target: table, ...: any): any
 ---#end
 
 ---
