@@ -11,11 +11,6 @@ local Proxy = setmetatable({}, Constructor)
 Proxy.instancesPropertiesMap = {}
 
 ---
----@class ProxyPrototype
----@overload fun(self: ProxyInstance, key: string): any
-Proxy.__index = {}
-
----
 ---@class ProxyInstance
 ---@overload fun(...: any): any
 ---@field [any] any
