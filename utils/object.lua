@@ -61,6 +61,9 @@ function Object.print(object)
 end
 
 --Transform objects into its string representation
+---@param object table
+---@param initalIdentation? string
+---@return string
 function Object.stringify(object, initalIdentation)
   if type(object) ~= 'table' then
     return tostring(object)
