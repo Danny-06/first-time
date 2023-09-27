@@ -41,6 +41,32 @@ function Proxy.constructor(self, target, handler)
   return self
 end
 
+---
+---@param target table
+---@param property any
+---@return any
+function Proxy.get(target, property)
+  return target[property]
+end
+
+---
+---@param target table
+---@param property any
+---@param value any
+function Proxy.set(target, property, value)
+  target[property] = value
+end
+
+---
+---@param target table
+---@param ... any
+---@return any
+function Proxy.call(target, ...)
+  return target(...)
+end
+
+------- # Handle Proxy access -------
+
 ---Handle getters
 ---@param self ProxyInstance
 ---@param key any
