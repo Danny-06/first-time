@@ -15,6 +15,46 @@ function Object.Constructor:__call(...)
   return self.constructor(instance, ...)
 end
 
+---
+---@param object table
+---@param property any
+---@return boolean
+function Object.hasProperty(object, property)
+  if object[property] == nil then
+    return false
+  end
+
+  return true
+end
+
+---
+---@param object table
+---@param property any
+---@return boolean
+function Object.hasOwnProperty(object, property)
+  if rawget(object, property) == nil then
+    return false
+  end
+
+  return true
+end
+
+---
+---@param target table
+---@param ... table Sources of objects to apply to the target
+---@return table
+function Object.assign(target, ...)
+  local args = {...}
+
+  for index, source in ipairs(args) do
+    for key, value in pairs(source) do
+      target[key] = value
+    end
+  end
+
+  return target
+end
+
 ---Print string representation of objects
 function Object.print(object)
   print(Object.stringify(object))
@@ -24,6 +64,12 @@ end
 function Object.stringify(object, initalIdentation)
   if type(object) ~= 'table' then
     return tostring(object)
+  end
+
+  if type(object.toString) == 'function' then
+    return object.toString()
+  elseif type(getmetatable(object).__tostring) == 'function' then
+    return getmetatable(object).__tostring(object)
   end
 
   local identation = '  '
