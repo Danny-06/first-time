@@ -71,7 +71,7 @@ function Object.stringify(object, initalIdentation)
 
   if type(object.toString) == 'function' then
     return object.toString()
-  elseif type(getmetatable(object).__tostring) == 'function' then
+  elseif getmetatable(object) ~= nil and type(getmetatable(object).__tostring) == 'function' then
     return getmetatable(object).__tostring(object)
   end
 
