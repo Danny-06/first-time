@@ -17,8 +17,8 @@ Iterator.__index = {}
 ---@field thread thread
 ---#end
 
----Turn Iterator instances into callable objects  
----to be able to use it in `for in` loops  
+---Turn Iterator instances into callable objects
+---to be able to use it in `for in` loops
 ---to iterate them
 ---```lua
 ---for value in iterator do
