@@ -53,6 +53,12 @@ function Object.stringify(object, initalIdentation)
       break
     end
 
+    local stringifiedKey = key
+
+    if type(key) == 'string' then
+      stringifiedKey = "'"..key.."'"
+    end
+
     local stringifiedValue = value
 
     if value == object then
@@ -63,7 +69,7 @@ function Object.stringify(object, initalIdentation)
       stringifiedValue = "'"..value.."'"
     end
 
-    objectString = objectString..identation.."['"..key.."']: "..tostring(stringifiedValue)..',\n'
+    objectString = objectString..identation..'['..stringifiedKey..']: '..tostring(stringifiedValue)..',\n'
   end
 
   local metatable = getmetatable(object)
