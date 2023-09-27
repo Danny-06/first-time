@@ -12,6 +12,7 @@ Iterator.__index = {}
 
 ---
 ---@class IteratorInstance: IteratorPrototype
+---@overload fun(...?: any): any -- Equivalent to `iterator.next()`
 ---@field func function
 ---@field thread thread
 ---#end
@@ -25,8 +26,7 @@ Iterator.__index = {}
 ---end
 ---```
 ---@param self IteratorInstance
----@overload fun(...?: unknown): unknown -- Equivalent to `iterator.next()`
----@return unknown
+---@return any
 function Iterator.__call(self)
   return self:next()
 end
@@ -44,8 +44,8 @@ end
 
 ---
 ---@param self IteratorInstance
----@param ... unknown
----@return unknown
+---@param ... any
+---@return any
 ---@nodiscard
 function Iterator.__index.next(self, ...)
   local resumeData = {coroutine.resume(self.thread, ...)}
