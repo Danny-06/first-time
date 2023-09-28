@@ -123,11 +123,6 @@ end
 function Object.stringify(object, initalIdentation, parents)
   parents = parents or {}
 
-  print('Parents: '..#parents)
-  for index, value in ipairs(parents) do
-    print('- '..tostring(value))
-  end
-
   if type(object) ~= 'table' then
     return tostring(object)
   end
