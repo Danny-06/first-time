@@ -48,8 +48,8 @@ end
 ---@return any
 ---@nodiscard
 function Iterator.__index.next(self, ...)
-  local resumeData = {coroutine.resume(self.thread, ...)}
-  return table.unpack(resumeData, 2)
+  local returnValues = select(2, coroutine.resume(self.thread, ...))
+  return returnValues
 end
 
 ---
