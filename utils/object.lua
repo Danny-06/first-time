@@ -195,7 +195,7 @@ function Object.stringify(object, initalIdentation, parents)
 
       stringifiedValue = Object.stringify(value, identation..'  ', clonedParents)
     elseif type(value) == 'string' then
-      stringifiedValue = ("'"..value.."'")
+      stringifiedValue = ("'"..value.."'"):gsub('\n', '\\n'):gsub('\t', '\\t')
     end
 
     objectString = objectString..identation..'['..stringifiedKey..']: '..tostring(stringifiedValue)..',\n'
