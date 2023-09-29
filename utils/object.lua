@@ -164,6 +164,8 @@ function Object.stringify(object, initalIdentation, parents)
 
     if type(key) == 'string' then
       stringifiedKey = "'"..key.."'"
+    else
+      stringifiedKey = tostring(key)
     end
 
     local stringifiedValue = value
