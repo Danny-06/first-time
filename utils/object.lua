@@ -133,15 +133,6 @@ function Object.stringify(object, initalIdentation, parents)
     return getmetatable(object).__tostring(object)
   end
 
-  -- Hopefully, one day I will implement key sorting
-  -- local keyTypesOrder = {
-  --   'boolean',
-  --   'number',
-  --   'string',
-  --   'table',
-  --   'function',
-  -- }
-
   local identation = '  '
 
   if type(initalIdentation) == 'string' then
@@ -181,9 +172,9 @@ function Object.stringify(object, initalIdentation, parents)
     local parentDeepLevel = valueIsEqualToAncestor and (#parents - ancestorIndex + 1) or nil
 
     if value == object then
-      stringifiedValue = '[[Self]]'
+      stringifiedValue = '@Self'
     elseif valueIsEqualToAncestor then
-      stringifiedValue = '[[Parent: '..parentDeepLevel..']]'
+      stringifiedValue = '@Parent('..parentDeepLevel..')'
     elseif type(value) == 'table' then
       local clonedParents = cloneList(parents)
       table.insert(clonedParents, object)
