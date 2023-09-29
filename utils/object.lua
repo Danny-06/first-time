@@ -198,7 +198,7 @@ function Object.stringify(object, initalIdentation, parents)
   end
 
   local debugMetatable = debug.getmetatable(object)
-  if debugMetatable ~= nil then
+  if debugMetatable ~= nil and debugMetatable ~= metatable then
     local clonedParents = cloneList(parents)
     table.insert(clonedParents, object)
 
