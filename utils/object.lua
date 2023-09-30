@@ -217,7 +217,7 @@ function Object.stringify(object, initalIdentation, parents)
     local clonedParents = cloneList(parents)
     table.insert(clonedParents, object)
 
-    local metatableKey = cmd.setStringANSIStyle('[MetaTable]', {isBold = true, color = cmd.colors.blue})
+    local metatableKey = cmd.setStringANSIStyle('['..cmd.setStringANSIStyle('MetaTable', {isItalic = true})..']', {isBold = true, color = cmd.colors.blue})
 
     objectString = objectString..'\n'..identation..'['..metatableKey..']: '..Object.stringify(metatable, identation..'  ', clonedParents)..',\n'
   end
@@ -227,7 +227,9 @@ function Object.stringify(object, initalIdentation, parents)
     local clonedParents = cloneList(parents)
     table.insert(clonedParents, object)
 
-    objectString = objectString..identation.."[[Debug: MetaTable]]: "..Object.stringify(debugMetatable, identation..'  ', clonedParents)..',\n'
+    local debugeMetatableKey = cmd.setStringANSIStyle('['..cmd.setStringANSIStyle('Debug: MetaTable', {isItalic = true})..']', {isBold = true, color = cmd.colors.blue})
+
+    objectString = objectString..identation..debugeMetatableKey..": "..Object.stringify(debugMetatable, identation..'  ', clonedParents)..',\n'
   end
 
   dicreaseIndentation()
