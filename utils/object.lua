@@ -128,9 +128,9 @@ function Object.stringify(object, initalIdentation, parents)
   end
 
   if type(object.toString) == 'function' then
-    return object.toString()
+    return object:toString(initalIdentation)
   elseif getmetatable(object) ~= nil and type(getmetatable(object).__tostring) == 'function' then
-    return getmetatable(object).__tostring(object)
+    return getmetatable(object).__tostring(object, initalIdentation)
   end
 
   local identation = '  '
