@@ -1,3 +1,4 @@
+local cmd = require('utils.cmd')
 local Object = {}
 
 
@@ -168,15 +169,26 @@ function Object.stringify(object, initalIdentation, parents)
       stringifiedKey = tostring(key)
     end
 
+    -- Key ANSI Style
+    if type(key) == 'number' then
+      stringifiedKey = cmd.setStringANSIStyle(stringifiedKey, {color = cmd.colors.green})
+    elseif type(key) == 'string' then
+      stringifiedKey = cmd.setStringANSIStyle(stringifiedKey, {color = cmd.colors.yellow})
+    elseif type(key) == 'table' then
+      stringifiedKey = cmd.setStringANSIStyle(stringifiedKey, {color = cmd.colors.cyan})
+    elseif type(key) == 'function' then
+      stringifiedKey = cmd.setStringANSIStyle(stringifiedKey, {color = cmd.colors.magenta})
+    end
+
     local stringifiedValue = value
 
     local valueIsEqualToAncestor, ancestorIndex = listContainsItemReverse(parents, value)
     local parentDeepLevel = valueIsEqualToAncestor and (#parents - ancestorIndex + 1) or nil
 
     if value == object then
-      stringifiedValue = '@Self'
+      stringifiedValue = cmd.setStringANSIStyle('@Self', {isBold = true, color = cmd.colors.blue})
     elseif valueIsEqualToAncestor then
-      stringifiedValue = '@Parent('..parentDeepLevel..')'
+      stringifiedValue = cmd.setStringANSIStyle('@Parent(', {isBold = true, color = cmd.colors.blue})..cmd.setStringANSIStyle(parentDeepLevel, {color = cmd.colors.green})..cmd.setStringANSIStyle(')', {isBold = true, color = cmd.colors.blue})
     elseif type(value) == 'table' then
       local clonedParents = cloneList(parents)
       table.insert(clonedParents, object)
@@ -186,7 +198,18 @@ function Object.stringify(object, initalIdentation, parents)
       stringifiedValue = ("'"..value.."'"):gsub('\n', '\\n'):gsub('\t', '\\t')
     end
 
-    objectString = objectString..identation..'['..stringifiedKey..']: '..tostring(stringifiedValue)..',\n'
+    stringifiedValue = tostring(stringifiedValue)
+
+    -- Value ANSI Style
+    if type(value) == 'number' then
+      stringifiedValue = cmd.setStringANSIStyle(stringifiedValue, {color = cmd.colors.green})
+    elseif type(value) == 'string' then
+      stringifiedValue = cmd.setStringANSIStyle(stringifiedValue, {color = cmd.colors.yellow})
+    elseif type(value) == 'function' then
+      stringifiedValue = cmd.setStringANSIStyle(stringifiedValue, {color = cmd.colors.magenta})
+    end
+
+    objectString = objectString..identation..'['..stringifiedKey..']: '..stringifiedValue..',\n'
   end
 
   local metatable = getmetatable(object)
@@ -194,7 +217,9 @@ function Object.stringify(object, initalIdentation, parents)
     local clonedParents = cloneList(parents)
     table.insert(clonedParents, object)
 
-    objectString = objectString..'\n'..identation.."[[MetaTable]]: "..Object.stringify(metatable, identation..'  ', clonedParents)..',\n'
+    local metatableKey = cmd.setStringANSIStyle('[MetaTable]', {isBold = true, color = cmd.colors.blue})
+
+    objectString = objectString..'\n'..identation..'['..metatableKey..']: '..Object.stringify(metatable, identation..'  ', clonedParents)..',\n'
   end
 
   local debugMetatable = debug.getmetatable(object)
