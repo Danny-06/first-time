@@ -226,6 +226,8 @@ function Object.stringify(object, initalIdentation, parents)
       stringifiedKey = cmd.setStringANSIStyle(stringifiedKey, {color = cmd.colors.cyan})
     elseif type(key) == 'function' then
       stringifiedKey = cmd.setStringANSIStyle(stringifiedKey, {color = cmd.colors.magenta})
+    elseif type(key) == 'userdata' or type(key) == 'thread' then
+      stringifiedKey = cmd.setStringANSIStyle(stringifiedKey, {color = cmd.colors.blue})
     end
 
     local stringifiedValue = value
@@ -259,6 +261,8 @@ function Object.stringify(object, initalIdentation, parents)
       stringifiedValue = cmd.setStringANSIStyle(stringifiedValue, {color = cmd.colors.yellow})
     elseif type(value) == 'function' then
       stringifiedValue = cmd.setStringANSIStyle(stringifiedValue, {color = cmd.colors.magenta})
+    elseif type(value) == 'userdata' or type(value) == 'thread' then
+      stringifiedValue = cmd.setStringANSIStyle(stringifiedValue, {color = cmd.colors.blue})
     end
 
     objectString = objectString..identation..'['..stringifiedKey..']: '..stringifiedValue..',\n'
