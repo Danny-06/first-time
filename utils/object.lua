@@ -116,6 +116,34 @@ local function cloneList(list)
   return clonedList
 end
 
+---
+---@param str string
+---@return string
+local function scapeCharactersToScapeRepresentation(str)
+  local result = str:gsub('\n', '\\n'):gsub('\r', '\\r'):gsub('\t', '\\t'):gsub('\v', '\\v'):gsub('\b', '\\b'):gsub('\f', '\\f')
+
+  return result
+end
+
+---
+---@param str string
+---@return string
+local function nonPrintableCharactersToUnicode(str)
+  local result = ''
+
+  local charCodes = {str:byte(1, #str)}
+
+  for index, charCode in ipairs(charCodes) do
+    if (charCode >= 0 and charCode <= 7) or (charCode >= 14 and charCode <= 31) or (charCode >= 127 and charCode <= 159) then
+      result = result..'\\u{'..string.format('%x', charCode)..'}'
+    end
+
+    result = result..string.char(charCode)
+  end
+
+  return result
+end
+
 --Transform objects into its string representation
 ---@param object table
 ---@param initalIdentation? string
@@ -164,21 +192,10 @@ function Object.stringify(object, initalIdentation, parents)
     local stringifiedKey = key
 
     if type(key) == 'string' then
-      stringifiedKey = ("'"..key.."'"):gsub('\n', '\\n'):gsub('\r', '\\r'):gsub('\t', '\\t'):gsub('\v', '\\v'):gsub('\b', '\\b'):gsub('\f', '\\f')
+      stringifiedKey = "'"..key.."'"
 
-      local charCodes = {stringifiedKey:byte(1, #stringifiedKey)}
-
-      local tempString = ''
-
-      for index, charCode in ipairs(charCodes) do
-        if (charCode >= 0 and charCode <= 7) or (charCode >= 14 and charCode <= 31)  then
-          tempString = tempString..'\\u{'..string.format('%x', charCode)..'}'
-        end
-
-        tempString = tempString..string.char(charCode)
-      end
-
-      stringifiedKey = tempString
+      stringifiedKey = scapeCharactersToScapeRepresentation(stringifiedKey)
+      stringifiedKey = nonPrintableCharactersToUnicode(stringifiedKey)
     else
       stringifiedKey = tostring(key)
     end
@@ -209,21 +226,10 @@ function Object.stringify(object, initalIdentation, parents)
 
       stringifiedValue = Object.stringify(value, identation..'  ', clonedParents)
     elseif type(value) == 'string' then
-      stringifiedValue = ("'"..value.."'"):gsub('\n', '\\n'):gsub('\r', '\\r'):gsub('\t', '\\t'):gsub('\v', '\\v'):gsub('\b', '\\b'):gsub('\f', '\\f')
+      stringifiedValue = "'"..value.."'"
 
-      local charCodes = {stringifiedValue:byte(1, #stringifiedValue)}
-
-      local tempString = ''
-
-      for index, charCode in ipairs(charCodes) do
-        if (charCode >= 0 and charCode <= 7) or (charCode >= 14 and charCode <= 31)  then
-          tempString = tempString..'\\u{'..string.format('%x', charCode)..'}'
-        end
-
-        tempString = tempString..string.char(charCode)
-      end
-
-      stringifiedValue = tempString
+      stringifiedValue = scapeCharactersToScapeRepresentation(stringifiedValue)
+      stringifiedValue = nonPrintableCharactersToUnicode(stringifiedValue)
     else
       stringifiedValue = tostring(stringifiedValue)
    end
