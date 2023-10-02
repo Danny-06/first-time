@@ -164,13 +164,27 @@ function Object.stringify(object, initalIdentation, parents)
     local stringifiedKey = key
 
     if type(key) == 'string' then
-      stringifiedKey = "'"..key.."'"
+      stringifiedKey = ("'"..key.."'"):gsub('\n', '\\n'):gsub('\r', '\\r'):gsub('\t', '\\t'):gsub('\v', '\\v'):gsub('\b', '\\b'):gsub('\f', '\\f')
+
+      local charCodes = {stringifiedKey:byte(1, #stringifiedKey)}
+
+      local tempString = ''
+
+      for index, charCode in ipairs(charCodes) do
+        if (charCode >= 0 and charCode <= 7) or (charCode >= 14 and charCode <= 31)  then
+          tempString = tempString..'\\u{'..string.format('%x', charCode)..'}'
+        end
+
+        tempString = tempString..string.char(charCode)
+      end
+
+      stringifiedKey = tempString
     else
       stringifiedKey = tostring(key)
     end
 
     -- Key ANSI Style
-    if type(key) == 'number' then
+    if type(key) == 'number' or type(key) == 'boolean' then
       stringifiedKey = cmd.setStringANSIStyle(stringifiedKey, {color = cmd.colors.green})
     elseif type(key) == 'string' then
       stringifiedKey = cmd.setStringANSIStyle(stringifiedKey, {color = cmd.colors.yellow})
@@ -195,13 +209,28 @@ function Object.stringify(object, initalIdentation, parents)
 
       stringifiedValue = Object.stringify(value, identation..'  ', clonedParents)
     elseif type(value) == 'string' then
-      stringifiedValue = ("'"..value.."'"):gsub('\n', '\\n'):gsub('\t', '\\t')
-    end
+      stringifiedValue = ("'"..value.."'"):gsub('\n', '\\n'):gsub('\r', '\\r'):gsub('\t', '\\t'):gsub('\v', '\\v'):gsub('\b', '\\b'):gsub('\f', '\\f')
 
-    stringifiedValue = tostring(stringifiedValue)
+      local charCodes = {stringifiedValue:byte(1, #stringifiedValue)}
+
+      local tempString = ''
+
+      for index, charCode in ipairs(charCodes) do
+        if (charCode >= 0 and charCode <= 7) or (charCode >= 14 and charCode <= 31)  then
+          tempString = tempString..'\\u{'..string.format('%x', charCode)..'}'
+        end
+
+        tempString = tempString..string.char(charCode)
+      end
+
+      stringifiedValue = tempString
+    else
+      stringifiedValue = tostring(stringifiedValue)
+   end
+
 
     -- Value ANSI Style
-    if type(value) == 'number' then
+    if type(value) == 'number' or type(value) == 'boolean' then
       stringifiedValue = cmd.setStringANSIStyle(stringifiedValue, {color = cmd.colors.green})
     elseif type(value) == 'string' then
       stringifiedValue = cmd.setStringANSIStyle(stringifiedValue, {color = cmd.colors.yellow})
@@ -217,7 +246,9 @@ function Object.stringify(object, initalIdentation, parents)
     local clonedParents = cloneList(parents)
     table.insert(clonedParents, object)
 
-    local metatableKey = cmd.setStringANSIStyle('['..cmd.setStringANSIStyle('MetaTable', {isItalic = true})..']', {isBold = true, color = cmd.colors.blue})
+    local metatableKey = cmd.setStringANSIStyle('[', {isBold = true, color = cmd.colors.blue})
+    metatableKey = metatableKey..cmd.setStringANSIStyle('MetaTable', {isItalic = true, isBold = true, color = cmd.colors.blue})
+    metatableKey = metatableKey..cmd.setStringANSIStyle(']', {isBold = true, color = cmd.colors.blue})
 
     objectString = objectString..'\n'..identation..'['..metatableKey..']: '..Object.stringify(metatable, identation..'  ', clonedParents)..',\n'
   end
