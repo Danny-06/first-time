@@ -3,10 +3,14 @@
 -- https://stackoverflow.com/questions/9168058/how-to-dump-a-table-to-console#answer-42062321
 -- https://gist.github.com/oatmealine/655c9e64599d0f0dd47687c1186de99f
 
--- local fileUtils = require('utils.file')
--- local Iterator = require('libs.iterator')
+require 'libs.null'
+local cmd = require 'utils.cmd'
+
+local fileUtils = require('utils.file')
+local Iterator = require('libs.iterator')
 local Object = require('utils.object')
 local Proxy = require('libs.proxy')
+local Array = require('libs.array')
 
 
 -- local function myGenerator()
@@ -21,20 +25,15 @@ local Proxy = require('libs.proxy')
 --   print('Value: ', value)
 -- end
 
--- local proxy = Proxy({}, {
---   get = function (target, property)
---     if property == 'sos' then
---       return 'lal'
---     end
 
---     return 'not lal'
---   end,
---   call = function ()
---     return 'Elise'
---   end
--- })
+-- Object.print(_G)
 
--- print(proxy.sos)
--- print(proxy.lel)
--- print(proxy.target)
--- print(proxy())
+local array = Array({'E', 'l', 'i', 's', 'e'})
+             :concat({' ', 'S', 'o', 'n', 'i', 'c'}, {' ', 'A', 'm', 'y'})
+             :concat({' ', 'SoS', 'Amy'})
+
+array:push(Array({'SoS', 'SeS', 'SaS'}))
+
+Object.print(array:flat())
+
+-- Object.print(_G)
