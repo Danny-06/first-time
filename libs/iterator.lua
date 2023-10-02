@@ -2,20 +2,9 @@ local Constructor = require('utils.object').Constructor
 
 ---
 ---@class IteratorClass
----@overload fun(func: function): IteratorInstance
----@field private constructor fun(self: IteratorInstance, func: function): IteratorInstance
+---@overload fun(func: function | string): IteratorInstance
+---@field private constructor fun(self: IteratorInstance, func: function | string): IteratorInstance
 local Iterator = setmetatable({}, Constructor)
-
----
----@class IteratorPrototype
-Iterator.__index = {}
-
----
----@class IteratorInstance: IteratorPrototype
----@overload fun(...?: any): any -- Equivalent to `iterator.next()`
----@field func function
----@field thread thread
----#end
 
 ---Turn Iterator instances into callable objects
 ---to be able to use it in `for in` loops
@@ -26,18 +15,44 @@ Iterator.__index = {}
 ---end
 ---```
 ---@param self IteratorInstance
----@return any
+---@return any ...
 function Iterator.__call(self)
   return self:next()
 end
 
 ---
+---@class IteratorPrototype
+Iterator.prototype = {}
+
+function Iterator.__index(self, key)
+  return Iterator.prototype[key]
+end
+
+---
+---@class IteratorInstance: IteratorPrototype
+---@overload fun(...?: any): any -- Equivalent to `iterator.next()`
+---@field func function
+---@field thread thread
+---#end
+
+
+---
 ---@param self IteratorInstance
----@param func function
+---@param func function | string
 ---@return IteratorInstance
 function Iterator.constructor(self, func)
-  self.func = func
-  self.thread = coroutine.create(func)
+  if type(func) == 'string' then
+    self.func = function()
+      for index = 1, #func, 1 do
+        local char = func[index]
+        coroutine.yield(char, index)
+      end
+    end
+    self.thread = coroutine.create(self.func)
+  elseif type(func) == 'function' then
+      self.func = func
+      self.thread = coroutine.create(func)
+  end
 
   return self
 end
@@ -45,24 +60,24 @@ end
 ---
 ---@param self IteratorInstance
 ---@param ... any
----@return any
+---@return any ...
 ---@nodiscard
-function Iterator.__index.next(self, ...)
-  local returnValues = select(2, coroutine.resume(self.thread, ...))
-  return returnValues
+function Iterator.prototype.next(self, ...)
+  local returnValues = {coroutine.resume(self.thread, ...)}
+  return table.unpack(returnValues, 2)
 end
 
 ---
 ---@param self IteratorInstance
 ---@return 'dead' | 'normal' | 'running' | 'suspended'
-function Iterator.__index.getThreadStatus(self)
+function Iterator.prototype.getThreadStatus(self)
   return coroutine.status(self.thread)
 end
 
 ---
 ---@param self IteratorInstance
 ---@return boolean
-function Iterator.__index.isDone(self)
+function Iterator.prototype.isDone(self)
   return self:getThreadStatus() == 'dead'
 end
 
