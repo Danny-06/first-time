@@ -120,7 +120,15 @@ end
 ---@param str string
 ---@return string
 local function scapeCharactersToScapeRepresentation(str)
-  local result = str:gsub('\n', '\\n'):gsub('\r', '\\r'):gsub('\t', '\\t'):gsub('\v', '\\v'):gsub('\b', '\\b'):gsub('\f', '\\f')
+  local scapeColor = cmd.colors.red
+
+  local result = str
+                 :gsub('\n', cmd.setStringANSIStyle('\\n', {color = scapeColor}))
+                 :gsub('\r', cmd.setStringANSIStyle('\\r', {color = scapeColor}))
+                 :gsub('\t', cmd.setStringANSIStyle('\\t', {color = scapeColor}))
+                 :gsub('\v', cmd.setStringANSIStyle('\\v', {color = scapeColor}))
+                 :gsub('\b', cmd.setStringANSIStyle('\\b', {color = scapeColor}))
+                 :gsub('\f', cmd.setStringANSIStyle('\\f', {color = scapeColor}))
 
   return result
 end
@@ -129,16 +137,25 @@ end
 ---@param str string
 ---@return string
 local function nonPrintableCharactersToUnicode(str)
+  local stringColor = cmd.colors.yellow
+  local unicodeColor = cmd.colors.red
+
   local result = ''
 
   local charCodes = {str:byte(1, #str)}
 
   for index, charCode in ipairs(charCodes) do
     if (charCode >= 0 and charCode <= 7) or (charCode >= 14 and charCode <= 31) or (charCode >= 127 and charCode <= 159) then
-      result = result..'\\u{'..string.format('%x', charCode)..'}'
-    end
+      local unicodeChar = '\\u{'..string.format('%x', charCode)..'}'
+      unicodeChar = cmd.setStringANSIStyle(unicodeChar, {color = unicodeColor})
 
-    result = result..string.char(charCode)
+      result = result..unicodeChar
+    else
+      local char = string.char(charCode)
+      char = cmd.setStringANSIStyle(char, {color = stringColor})
+  
+      result = result..char
+    end
   end
 
   return result
@@ -194,8 +211,8 @@ function Object.stringify(object, initalIdentation, parents)
     if type(key) == 'string' then
       stringifiedKey = "'"..key.."'"
 
-      stringifiedKey = scapeCharactersToScapeRepresentation(stringifiedKey)
       stringifiedKey = nonPrintableCharactersToUnicode(stringifiedKey)
+      stringifiedKey = scapeCharactersToScapeRepresentation(stringifiedKey)
     else
       stringifiedKey = tostring(key)
     end
@@ -228,8 +245,8 @@ function Object.stringify(object, initalIdentation, parents)
     elseif type(value) == 'string' then
       stringifiedValue = "'"..value.."'"
 
-      stringifiedValue = scapeCharactersToScapeRepresentation(stringifiedValue)
       stringifiedValue = nonPrintableCharactersToUnicode(stringifiedValue)
+      stringifiedValue = scapeCharactersToScapeRepresentation(stringifiedValue)
     else
       stringifiedValue = tostring(stringifiedValue)
    end
