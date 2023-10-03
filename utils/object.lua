@@ -17,8 +17,9 @@ function Object.Constructor:__call(...)
 end
 
 ---
----@param object table
----@param property any
+---@generic K
+---@param object table<K>
+---@param property K
 ---@return boolean
 function Object.hasProperty(object, property)
   if object[property] == nil then
@@ -29,8 +30,9 @@ function Object.hasProperty(object, property)
 end
 
 ---
----@param object table
----@param property any
+---@generic K
+---@param object table<K>
+---@param property K
 ---@return boolean
 function Object.hasOwnProperty(object, property)
   if rawget(object, property) == nil then
@@ -41,9 +43,10 @@ function Object.hasOwnProperty(object, property)
 end
 
 ---
----@param target table
+---@generic T: table
+---@param target T
 ---@param ... table Sources of objects to apply to the target
----@return table
+---@return T
 function Object.assign(target, ...)
   local args = {...}
 
@@ -56,20 +59,39 @@ function Object.assign(target, ...)
   return target
 end
 
----Print string representation of objects
-function Object.print(object)
-  print(Object.stringify(object))
+---
+---@generic T
+---@param list T[]
+---@return T[]
+function Object.cloneList(list)
+  if list == nil then
+    error("'list' cannot be 'nil'")
+  end
+
+  if type(list) ~= 'table' then
+    error("'list' must be a table")
+  end
+
+  local clonedList = {}
+
+  for index, value in ipairs(list) do
+    clonedList[index] = value
+  end
+
+  return clonedList
 end
 
----Helper functions for lists
-
----
----@param list any[] | nil
+--- Only positives indexes are iterated
+---@param list any[]
 ---@param item any
 ---@return boolean, number?
-local function listContainsItem(list, item)
+function Object.listContainsItem(list, item)
   if list == nil then
-    return false
+    error("'list' cannot be 'nil'")
+  end
+
+  if type(list) ~= 'table' then
+    error("'list' must be a table")
   end
 
   for index = 1, #list, 1 do
@@ -81,13 +103,17 @@ local function listContainsItem(list, item)
   return false
 end
 
----
----@param list any[] | nil
+--- Only positives indexes are iterated
+---@param list any[]
 ---@param item any
 ---@return boolean, number?
-local function listContainsItemReverse(list, item)
+function Object.listContainsItemReverse(list, item)
   if list == nil then
-    return false
+    error("'list' cannot be 'nil'")
+  end
+
+  if type(list) ~= 'table' then
+    error("'list' must be a table")
   end
 
   for index = #list, 1, -1 do
@@ -99,22 +125,27 @@ local function listContainsItemReverse(list, item)
   return false
 end
 
----
----@param list any[]
----@return any[]
-local function cloneList(list)
+--- Only positives indexes are spreaded
+---@generic T
+---@param list T[]
+---@return T ...
+function Object.spreadList(list)
   if list == nil then
     error("'list' cannot be 'nil'")
   end
 
-  local clonedList = {}
-
-  for index = 1, #list, 1 do
-    clonedList[index] = list[index]
+  if type(list) ~= 'table' then
+    error("'list' must be a table")
   end
 
-  return clonedList
+  return table.unpack(list, 1, #list)
 end
+
+---Print string representation of objects
+function Object.print(object)
+  print(Object.stringify(object))
+end
+
 
 ---
 ---@param str string
@@ -122,13 +153,13 @@ end
 local function scapeCharactersToScapeRepresentation(str)
   local scapeColor = cmd.colors.red
 
+  local chars = {['\n'] = '\\n', ['\r'] = '\\r', ['\t'] = '\\t', ['\v'] = '\\v', ['\b'] = '\\b', ['\f'] = '\\f'}
+
   local result = str
-                 :gsub('\n', cmd.setStringANSIStyle('\\n', {color = scapeColor}))
-                 :gsub('\r', cmd.setStringANSIStyle('\\r', {color = scapeColor}))
-                 :gsub('\t', cmd.setStringANSIStyle('\\t', {color = scapeColor}))
-                 :gsub('\v', cmd.setStringANSIStyle('\\v', {color = scapeColor}))
-                 :gsub('\b', cmd.setStringANSIStyle('\\b', {color = scapeColor}))
-                 :gsub('\f', cmd.setStringANSIStyle('\\f', {color = scapeColor}))
+
+  for char, charPrint in pairs(chars) do
+    result = result:gsub(char, cmd.setStringANSIStyle(charPrint, {color = scapeColor}))
+  end
 
   return result
 end
@@ -232,7 +263,7 @@ function Object.stringify(object, initalIdentation, parents)
 
     local stringifiedValue = value
 
-    local valueIsEqualToAncestor, ancestorIndex = listContainsItemReverse(parents, value)
+    local valueIsEqualToAncestor, ancestorIndex = Object.listContainsItemReverse(parents, value)
     local parentDeepLevel = valueIsEqualToAncestor and (#parents - ancestorIndex + 1) or nil
 
     if value == object then
@@ -240,7 +271,7 @@ function Object.stringify(object, initalIdentation, parents)
     elseif valueIsEqualToAncestor then
       stringifiedValue = cmd.setStringANSIStyle('@Parent(', {isBold = true, color = cmd.colors.blue})..cmd.setStringANSIStyle(parentDeepLevel, {color = cmd.colors.green})..cmd.setStringANSIStyle(')', {isBold = true, color = cmd.colors.blue})
     elseif type(value) == 'table' then
-      local clonedParents = cloneList(parents)
+      local clonedParents = Object.cloneList(parents)
       table.insert(clonedParents, object)
 
       stringifiedValue = Object.stringify(value, identation..'  ', clonedParents)
@@ -270,8 +301,9 @@ function Object.stringify(object, initalIdentation, parents)
 
   local metatable = getmetatable(object)
   if metatable ~= nil then
-    local clonedParents = cloneList(parents)
-    table.insert(clonedParents, object)
+    -- local clonedParents = Object.cloneList(parents)
+    -- table.insert(clonedParents, object)
+    local clonedParents = {Object.spreadList(parents), object}
 
     local metatableKey = cmd.setStringANSIStyle('[', {isBold = true, color = cmd.colors.blue})
     metatableKey = metatableKey..cmd.setStringANSIStyle('MetaTable', {isItalic = true, isBold = true, color = cmd.colors.blue})
@@ -282,8 +314,9 @@ function Object.stringify(object, initalIdentation, parents)
 
   local debugMetatable = debug.getmetatable(object)
   if debugMetatable ~= nil and debugMetatable ~= metatable then
-    local clonedParents = cloneList(parents)
-    table.insert(clonedParents, object)
+    -- local clonedParents = Object.cloneList(parents)
+    -- table.insert(clonedParents, object)
+    local clonedParents = {Object.spreadList(parents), object}
 
     local debugeMetatableKey = cmd.setStringANSIStyle('['..cmd.setStringANSIStyle('Debug: MetaTable', {isItalic = true})..']', {isBold = true, color = cmd.colors.blue})
 
