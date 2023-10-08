@@ -27,24 +27,23 @@ function Number.rotateIfOutOfRange(number, from, to)
     error("'from' must be lower than 'to'")
   end
 
-  local result = number
-
   local normalizedFrom = 0 -- from - from
   local normalizedTo = to - from
   local normalizedNumber = number - from
 
+  local result = normalizedNumber
+
   if normalizedNumber > normalizedTo then
     result = normalizedNumber % (normalizedTo + 1)
-    result = result + from
   elseif normalizedNumber < normalizedFrom then
     result = (normalizedTo + 1) - math.abs(normalizedNumber) % (normalizedTo + 1)
 
     if result == normalizedTo + 1 then
       result = 0
     end
-
-    result = result + from
   end
+
+  result = result + from
 
   return result
 end
