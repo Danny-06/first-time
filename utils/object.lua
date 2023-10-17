@@ -220,14 +220,6 @@ function Object.stringify(object, initalIdentation, parents)
 
   local objectString = '{\n'
 
-  local function increaseIndentation()
-    identation = identation..'  '
-  end
-
-  local function dicreaseIndentation()
-    identation = identation:sub(1, identation:len() - 2)
-  end
-
   local key, value = nil, nil
 
   while true do
@@ -323,9 +315,7 @@ function Object.stringify(object, initalIdentation, parents)
     objectString = objectString..identation..debugeMetatableKey..": "..Object.stringify(debugMetatable, identation..'  ', clonedParents)..',\n'
   end
 
-  dicreaseIndentation()
-  objectString = objectString..identation..'}'
-  increaseIndentation()
+  objectString = objectString..identation:sub(1, identation:len() - 2)..'}'
 
   if objectString == emptyObjectString then
     return '{}'
