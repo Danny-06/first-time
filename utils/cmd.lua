@@ -63,7 +63,7 @@ function cmd.setStringANSIStyle(str, options)
   options.isUnderline = options.isUnderline and cmd.fontStyles.underline or nil
   options.isStrikeThrough = options.isStrikeThrough and cmd.fontStyles.strikethrough or nil
   options.isInvisible = options.isInvisible and cmd.fontStyles.invisible or nil
-  options.isInverse = options.isInverse and cmd.fontStyles.isInverse or nil
+  options.isInverse = options.isInverse and cmd.fontStyles.inverse or nil
 
   for key, value in pairs(options) do
     codes = codes..value..';' --[[@as string]]
