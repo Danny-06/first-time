@@ -10,7 +10,8 @@ local fileUtils = require('utils.file')
 local Iterator = require('libs.iterator')
 local Object = require('utils.object')
 local Proxy = require('libs.proxy')
-local Array = require('libs.array')
+local Array = require('libs.array.index')
+local Number = require('utils.number')
 
 
 -- local function myGenerator()
@@ -28,12 +29,19 @@ local Array = require('libs.array')
 
 -- Object.print(_G)
 
-local array = Array({'E', 'l', 'i', 's', 'e'})
-             :concat({' ', 'S', 'o', 'n', 'i', 'c'}, {' ', 'A', 'm', 'y'})
-             :concat({' ', 'SoS', 'Amy'})
+-- local array = Array({'S', 'o', 'n', 'i', 'c', ' ', 'E', 'l', 'i', 's', 'e'})
+-- Object.print(array:at(-1 - array.length * 3))
 
-array:push(Array({'SoS', 'SeS', 'SaS'}))
+local array = Array.of(1, 2, 3, 4, 5)
+-- print(array:at(-6))
 
-Object.print(array:flat())
+Object.print(array)
+Object.print(array:shuffle())
+
+-- array:insertBefore(6, ' ', '2006')
+-- array:insertAfter(6, '2006', ' ')
+-- Object.print(otherArray)
+
+-- Object.print(array)
 
 -- Object.print(_G)
