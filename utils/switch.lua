@@ -1,9 +1,9 @@
 
 ---
----@param value any
----@param cases {[any]: function}
+---@param value unknown
+---@param cases {[unknown]: function}
 ---@param defaultAction? function
----@return any
+---@return unknown
 local function switch(value, cases, defaultAction)
   local caseAction = cases[value]
 
@@ -11,15 +11,21 @@ local function switch(value, cases, defaultAction)
 
   if caseActionType == 'function' then
     return caseAction()
-  elseif caseAction == nil then
-    if type(defaultAction) == 'function' then
-      return defaultAction()
-    elseif caseAction ~= nil then
-      error("'cases' must be a function or not specified")
-    end
-  else
-    error("'cases' must be an object of functions")
   end
+
+  if caseAction ~= nil then
+    error("'cases' must be an object of functions or not specified")
+  end
+
+  if type(defaultAction) == 'function' then
+    return defaultAction()
+  end
+
+  if defaultAction ~= nil then
+    error("'defaultAction' must be a function or not specified")
+  end
+
+  return nil
 end
 
 return switch

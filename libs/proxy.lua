@@ -12,8 +12,8 @@ Proxy.instancesPropertiesMap = {}
 
 ---
 ---@class ProxyInstance
----@overload fun(...: any): any
----@field [any] any
+---@overload fun(...: unknown): unknown
+---@field [unknown] unknown
 ---#end
 
 ---
@@ -28,7 +28,7 @@ end
 
 ---
 ---@class Handler
----@field get? fun(target: table, property: any): any
+---@field get? fun(target: table, property: unknown): unknown
 ---@field set? fun(target: table, property: any, value: any)
 ---@field call? fun(target: table, ...: any): any
 ---#end
@@ -70,7 +70,7 @@ end
 
 ---
 ---@param target table
----@param property any
+---@param property unknown
 ---@return any
 function Proxy.get(target, property)
   return target[property]
@@ -78,16 +78,16 @@ end
 
 ---
 ---@param target table
----@param property any
----@param value any
+---@param property unknown
+---@param value unknown
 function Proxy.set(target, property, value)
   target[property] = value
 end
 
 ---
 ---@param target table
----@param ... any
----@return any
+---@param ... unknown
+---@return unknown
 function Proxy.call(target, ...)
   return target(...)
 end
@@ -96,8 +96,8 @@ end
 
 ---Handle getters
 ---@param self ProxyInstance
----@param key any
----@return any
+---@param key unknown
+---@return unknown
 function Proxy.__index(self, key)
   local target = Proxy.instancesPropertiesMap[self].target
   local handler = Proxy.instancesPropertiesMap[self].handler
@@ -111,8 +111,8 @@ end
 
 ---Handle setters
 ---@param self ProxyInstance
----@param key any
----@param value any
+---@param key unknown
+---@param value unknown
 function Proxy.__newindex(self, key, value)
   local target = Proxy.instancesPropertiesMap[self].target
   local handler = Proxy.instancesPropertiesMap[self].handler
@@ -127,7 +127,7 @@ end
 
 ---Handle calling object
 ---@param self ProxyInstance
----@param ... any
+---@param ... unknown
 function Proxy.__call(self, ...)
   local target = Proxy.instancesPropertiesMap[self].target
   local handler = Proxy.instancesPropertiesMap[self].handler

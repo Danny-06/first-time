@@ -38,20 +38,20 @@ end
 
 ---
 ---@param self IteratorInstance
----@param func function | string
+---@param funcOrString function | string
 ---@return IteratorInstance
-function Iterator.constructor(self, func)
-  if type(func) == 'string' then
+function Iterator.constructor(self, funcOrString)
+  if type(funcOrString) == 'string' then
     self.func = function()
-      for index = 1, #func, 1 do
-        local char = func[index]
+      for index = 1, #funcOrString, 1 do
+        local char = funcOrString[index]
         coroutine.yield(char, index)
       end
     end
     self.thread = coroutine.create(self.func)
-  elseif type(func) == 'function' then
-      self.func = func
-      self.thread = coroutine.create(func)
+  elseif type(funcOrString) == 'function' then
+      self.func = funcOrString
+      self.thread = coroutine.create(funcOrString)
   end
 
   return self
